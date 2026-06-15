@@ -1,0 +1,48 @@
+package com.example.treasury.rules;
+
+import com.example.treasury.domain.RequestType;
+import com.example.treasury.rules.EligibilityFacts;
+import com.example.treasury.rules.EligibilityDecision;
+import java.math.BigDecimal;
+
+global EligibilityDecision decision;
+
+rule "Reject missing client"
+salience 100
+when
+    $facts : EligibilityFacts(clientName == null || clientName.length() == 0)
+then
+    decision.reject("Client name is required before treasury processing can continue");
+end
+
+rule "Reject unsupported currency"
+salience 90
+when
+    $facts : EligibilityFacts(paymentCurrency != null && !(paymentCurrency == "USD" || paymentCurrency == "EUR" || paymentCurrency == "GBP"))
+then
+    decision.reject("Payment currency must be USD, EUR, or GBP for this demo workflow");
+end
+
+rule "Reject high risk request"
+salience 80
+when
+    $facts : EligibilityFacts(riskScore != null && riskScore > 85)
+then
+    decision.reject("Risk score is above the eligibility threshold");
+end
+
+rule "Require approval for large payments"
+salience 70
+when
+    $facts : EligibilityFacts(paymentAmount != null && paymentAmount.compareTo(new BigDecimal("100000")) >= 0)
+then
+    decision.requireApproval("Large treasury payment requires banker approval");
+end
+
+rule "Require approval for FX payments"
+salience 60
+when
+    $facts : EligibilityFacts(requestType == RequestType.FX_PAYMENT)
+then
+    decision.requireApproval("FX payments require approval before downstream dispatch");
+end

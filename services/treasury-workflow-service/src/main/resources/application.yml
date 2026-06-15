@@ -1,0 +1,76 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: treasury-workflow-service
+  datasource:
+    url: jdbc:h2:mem:treasury;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  h2:
+    console:
+      enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+  batch:
+    job:
+      enabled: false
+    jdbc:
+      initialize-schema: always
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      group-id: treasury-workflow
+      auto-offset-reset: earliest
+      properties:
+        spring.json.trusted.packages: com.example.treasury.messaging
+  rabbitmq:
+    host: localhost
+    username: guest
+    password: guest
+
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  health:
+    rabbit:
+      enabled: false
+    kafka:
+      enabled: false
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+treasury:
+  messaging:
+    kafka:
+      topic: treasury.workflow.events
+    rabbit:
+      exchange: treasury.workflow
+      queue: treasury.workflow.events
+      routing-key: treasury.workflow.request
+  aws:
+    region: us-east-1
+    endpoint: http://localhost:4566
+    sqs-queue-url: http://localhost:4566/000000000000/treasury-workflow-events
+    sns-topic-arn: arn:aws:sns:us-east-1:000000000000:treasury-workflow-events
+    audit-bucket: treasury-audit
+    audit-table: treasury_request_audit

@@ -1,0 +1,83 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: treasury
+      POSTGRES_USER: treasury
+      POSTGRES_PASSWORD: treasury
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U treasury -d treasury"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  zookeeper:
+    image: bitnami/zookeeper:3.9
+    environment:
+      ALLOW_ANONYMOUS_LOGIN: "yes"
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: bitnami/kafka:3.6
+    depends_on:
+      - zookeeper
+    environment:
+      ALLOW_PLAINTEXT_LISTENER: "yes"
+      KAFKA_CFG_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092,PLAINTEXT_INTERNAL://:29092
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka:29092
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+      KAFKA_CFG_INTER_BROKER_LISTENER_NAME: PLAINTEXT_INTERNAL
+    ports:
+      - "9092:9092"
+
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    environment:
+      RABBITMQ_DEFAULT_USER: treasury
+      RABBITMQ_DEFAULT_PASS: treasury
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  localstack:
+    image: localstack/localstack:3
+    environment:
+      SERVICES: sqs,sns,s3,dynamodb,lambda,apigateway,cloudwatch,iam,ec2
+      AWS_DEFAULT_REGION: us-east-1
+    ports:
+      - "4566:4566"
+
+  treasury-api:
+    build:
+      context: .
+      dockerfile: services/treasury-workflow-service/Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+    environment:
+      SPRING_PROFILES_ACTIVE: postgres,kafka
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/treasury
+      SPRING_DATASOURCE_USERNAME: treasury
+      SPRING_DATASOURCE_PASSWORD: treasury
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      TREASURY_AWS_ENDPOINT: http://localstack:4566
+    ports:
+      - "8080:8080"
+
+  react-portal:
+    build:
+      context: frontend/react-portal
+    depends_on:
+      - treasury-api
+    environment:
+      VITE_API_BASE_URL: http://localhost:8080
+    ports:
+      - "5173:5173"

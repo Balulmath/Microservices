@@ -1,0 +1,8 @@
+treasury:
+  aws:
+    region: us-east-1
+    endpoint: ${TREASURY_AWS_ENDPOINT:http://localhost:4566}
+    sqs-queue-url: ${TREASURY_AWS_SQS_QUEUE_URL:http://localhost:4566/000000000000/treasury-workflow-events}
+    sns-topic-arn: ${TREASURY_AWS_SNS_TOPIC_ARN:arn:aws:sns:us-east-1:000000000000:treasury-workflow-events}
+    audit-bucket: ${TREASURY_AWS_AUDIT_BUCKET:treasury-audit}
+    audit-table: ${TREASURY_AWS_AUDIT_TABLE:treasury_request_audit}

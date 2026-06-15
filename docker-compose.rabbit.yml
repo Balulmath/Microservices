@@ -1,0 +1,9 @@
+version: "3.9"
+
+services:
+  treasury-api:
+    environment:
+      SPRING_PROFILES_ACTIVE: postgres,rabbit
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_USERNAME: treasury
+      SPRING_RABBITMQ_PASSWORD: treasury

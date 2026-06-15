@@ -1,0 +1,91 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Treasury workflow supporting AWS resources for SQS, SNS, S3, DynamoDB, Lambda, API Gateway, IAM, and CloudWatch.
+
+Resources:
+  WorkflowQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: treasury-workflow-events
+      VisibilityTimeout: 60
+
+  WorkflowTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: treasury-workflow-events
+
+  AuditBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+
+  AuditTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: treasury_request_audit
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: request_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: request_id
+          KeyType: HASH
+
+  WorkflowLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/treasury/workflow
+      RetentionInDays: 30
+
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  AuditLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: treasury-audit-router
+      Runtime: nodejs20.x
+      Handler: index.handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Code:
+        ZipFile: |
+          exports.handler = async function(event) {
+            console.log(JSON.stringify(event));
+            return { statusCode: 200, body: "treasury audit placeholder" };
+          };
+
+  TreasuryApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: treasury-workflow-api
+
+  TreasuryEc2Role:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+
+Outputs:
+  QueueUrl:
+    Value: !Ref WorkflowQueue
+  TopicArn:
+    Value: !Ref WorkflowTopic
+  ApiId:
+    Value: !Ref TreasuryApi

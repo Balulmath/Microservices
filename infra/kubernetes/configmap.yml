@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: treasury-config
+  namespace: treasury
+data:
+  SPRING_PROFILES_ACTIVE: "postgres,kafka"
+  SPRING_KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
+  TREASURY_AWS_ENDPOINT: "http://localstack:4566"

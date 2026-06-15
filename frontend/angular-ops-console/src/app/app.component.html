@@ -1,0 +1,46 @@
+<main class="ops-shell">
+  <section class="ops-header">
+    <div>
+      <p>Angular operations console</p>
+      <h1>Treasury Request Queue</h1>
+    </div>
+    <button class="btn btn-dark" (click)="refresh()" [disabled]="loading">Refresh</button>
+  </section>
+
+  <div *ngIf="error" class="alert alert-danger py-2">{{ error }}</div>
+
+  <section class="ops-grid">
+    <div class="queue-panel">
+      <table class="table align-middle">
+        <thead>
+          <tr>
+            <th>Request</th>
+            <th>Client</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let request of requests" (click)="select(request)" [class.selected]="selected?.requestId === request.requestId">
+            <td>{{ request.requestId }}</td>
+            <td>{{ request.clientName }}</td>
+            <td><span class="status-chip">{{ request.status }}</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <aside class="detail-panel" *ngIf="selected">
+      <span>Selected request</span>
+      <h2>{{ selected.requestId }}</h2>
+      <p>{{ selected.clientName }}</p>
+      <dl>
+        <dt>Type</dt>
+        <dd>{{ selected.requestType }}</dd>
+        <dt>Stage</dt>
+        <dd>{{ selected.currentStage }}</dd>
+        <dt>Reason</dt>
+        <dd>{{ selected.statusReason }}</dd>
+      </dl>
+    </aside>
+  </section>
+</main>
