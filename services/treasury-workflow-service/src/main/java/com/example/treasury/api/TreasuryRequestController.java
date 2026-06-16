@@ -39,13 +39,13 @@ public class TreasuryRequestController {
     }
 
     @GetMapping("/{requestId}")
-    @PreAuthorize("hasAnyRole('BANKER','OPERATIONS','ADMIN')")
+    @PreAuthorize("hasAnyRole('BANKER','MANAGER','OPERATIONS','ADMIN')")
     public TreasuryRequestResponse get(@PathVariable String requestId) {
         return TreasuryRequestResponse.from(requestService.get(requestId));
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('BANKER','OPERATIONS','ADMIN')")
+    @PreAuthorize("hasAnyRole('BANKER','MANAGER','OPERATIONS','ADMIN')")
     public List<TreasuryRequestResponse> search(@RequestParam(required = false) RequestStatus status,
                                                 @RequestParam(required = false) RequestType requestType,
                                                 @RequestParam(required = false) String clientName) {
@@ -58,13 +58,13 @@ public class TreasuryRequestController {
     }
 
     @GetMapping("/{requestId}/timeline")
-    @PreAuthorize("hasAnyRole('BANKER','OPERATIONS','ADMIN')")
+    @PreAuthorize("hasAnyRole('BANKER','MANAGER','OPERATIONS','ADMIN')")
     public List<RequestStatusEvent> timeline(@PathVariable String requestId) {
         return requestService.timeline(requestId);
     }
 
     @PostMapping("/{requestId}/approve")
-    @PreAuthorize("hasAnyRole('BANKER','ADMIN')")
+    @PreAuthorize("hasAnyRole('MANAGER','ADMIN')")
     public TreasuryRequestResponse approve(@PathVariable String requestId,
                                            @Valid @RequestBody StatusUpdateRequest input) {
         return TreasuryRequestResponse.from(requestService.approve(requestId, input.getActor(), input.getReason()));
@@ -78,7 +78,7 @@ public class TreasuryRequestController {
     }
 
     @GetMapping("/dashboard")
-    @PreAuthorize("hasAnyRole('BANKER','OPERATIONS','ADMIN')")
+    @PreAuthorize("hasAnyRole('BANKER','MANAGER','OPERATIONS','ADMIN')")
     public DashboardSummary dashboard() {
         return requestService.dashboard();
     }

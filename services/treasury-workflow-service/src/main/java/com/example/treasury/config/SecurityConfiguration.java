@@ -47,15 +47,19 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .password(encoder.encode("banker123"))
                 .roles("BANKER")
                 .build();
+        UserDetails manager = User.withUsername("manager")
+                .password(encoder.encode("manager123"))
+                .roles("MANAGER")
+                .build();
         UserDetails operations = User.withUsername("operations")
                 .password(encoder.encode("ops123"))
                 .roles("OPERATIONS")
                 .build();
         UserDetails admin = User.withUsername("admin")
                 .password(encoder.encode("admin123"))
-                .roles("ADMIN", "BANKER", "OPERATIONS")
+                .roles("ADMIN", "BANKER", "MANAGER", "OPERATIONS")
                 .build();
-        return new InMemoryUserDetailsManager(banker, operations, admin);
+        return new InMemoryUserDetailsManager(banker, manager, operations, admin);
     }
 
     @Bean

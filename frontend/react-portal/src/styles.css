@@ -20,11 +20,93 @@ select {
   padding: 24px;
 }
 
+.login-shell {
+  align-items: center;
+  display: flex;
+  min-height: 100vh;
+  padding: 24px;
+}
+
+.login-panel {
+  background: #fff;
+  border: 1px solid #dde1e5;
+  border-radius: 8px;
+  display: grid;
+  gap: 18px;
+  margin: 0 auto;
+  max-width: 760px;
+  padding: 24px;
+  width: 100%;
+}
+
+.login-form {
+  align-items: end;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+}
+
+.role-picks {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.role-pick {
+  align-items: start;
+  background: #f5f6f1;
+  border: 1px solid #dde1e5;
+  border-radius: 8px;
+  color: #18202a;
+  display: grid;
+  gap: 6px;
+  justify-items: start;
+  min-height: 108px;
+  padding: 12px;
+  text-align: left;
+}
+
+.role-pick strong,
+.role-pick span {
+  display: block;
+}
+
+.role-pick span {
+  color: #596170;
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 0.76rem;
+  overflow-wrap: anywhere;
+}
+
 .topbar {
   align-items: center;
   display: flex;
+  gap: 16px;
   justify-content: space-between;
   margin-bottom: 18px;
+}
+
+.topbar-actions,
+.action-row {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+}
+
+.role-badge,
+.mini-badge {
+  align-items: center;
+  background: #fff;
+  border: 1px solid #dde1e5;
+  border-radius: 8px;
+  color: #314b7a;
+  display: inline-flex;
+  font-size: 0.78rem;
+  font-weight: 700;
+  gap: 6px;
+  min-height: 38px;
+  padding: 0 10px;
+  white-space: nowrap;
 }
 
 .eyebrow {
@@ -46,7 +128,8 @@ h2 {
 
 .icon-button,
 .primary-button,
-.secondary-button {
+.secondary-button,
+.danger-button {
   align-items: center;
   border: 0;
   border-radius: 8px;
@@ -72,6 +155,15 @@ h2 {
 .secondary-button {
   background: #314b7a;
   color: #fff;
+}
+
+.danger-button {
+  background: #933532;
+  color: #fff;
+}
+
+.full-width {
+  width: 100%;
 }
 
 button:disabled {
@@ -160,6 +252,31 @@ label select {
 .request-list,
 .detail-panel {
   min-width: 0;
+}
+
+.role-panel {
+  align-content: start;
+  display: grid;
+  gap: 12px;
+}
+
+.queue-summary {
+  background: #f5f6f1;
+  border-radius: 8px;
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+}
+
+.queue-summary span {
+  color: #596170;
+  font-size: 0.84rem;
+}
+
+.queue-summary strong {
+  color: #745a15;
+  font-size: 2rem;
+  line-height: 1;
 }
 
 .search-box {
@@ -332,13 +449,22 @@ label select {
 
   .metrics-grid,
   .workspace-grid,
-  .two-col {
+  .two-col,
+  .login-form,
+  .role-picks {
     grid-template-columns: 1fr;
   }
 
+  .topbar,
   .panel-heading {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .topbar-actions,
+  .action-row {
+    align-items: stretch;
+    flex-wrap: wrap;
   }
 
   .search-box input {

@@ -1,3 +1,12 @@
+export type UserRole = "BANKER" | "MANAGER" | "OPERATIONS" | "ADMIN";
+
+export interface AuthSession {
+  username: string;
+  password: string;
+  role: UserRole;
+  portalTitle: string;
+}
+
 export type RequestStatus =
   | "RECEIVED"
   | "ELIGIBILITY_REVIEW"
